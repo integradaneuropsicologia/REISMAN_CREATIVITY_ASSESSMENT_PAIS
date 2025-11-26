@@ -1,1 +1,456 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Inventário de Criatividade (REISMAN_CREATIVITY_ASSESSMENT) - Versão pais</title>
+<meta name="description" content="Inventário de Criatividade – Versão Observacional para pais. Integrada Neuropsicologia.">
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --line:#1f2937;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --pri:#4f46e5;
+  --ok:#22c55e;
+  --err:#ef4444;
+  --chip:#0b1220;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+.wrap{
+  max-width:1000px;
+  margin:24px auto;
+  padding:0 16px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 0 10px #0004;
+}
+h1{font-size:1.35rem;margin-bottom:4px}
+.muted{color:var(--muted)}
+.grid-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:16px 0;
+}
+@media(max-width:720px){.grid-info{grid-template-columns:1fr}}
+.info{
+  background:var(--chip);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+}
+.info b{display:block;color:#cbd5e1;margin-bottom:4px}
+.q{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--chip);
+  padding:12px;
+  margin-bottom:10px;
+}
+.q h3{margin:0 0 6px;font-size:.95rem}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+label.opt{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:9px;
+  padding:6px 10px;
+  cursor:pointer;
+}
+label.opt:has(input[type="radio"]:checked){
+  background:var(--pri);
+  border-color:var(--pri);
+  color:#fff;
+}
+label.opt input{accent-color:var(--pri)}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--ok);
+  border:none;
+  border-radius:10px;
+  color:#fff;
+  padding:10px 14px;
+  cursor:pointer;
+  font-weight:600;
+}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.msg{margin:10px 0;padding:10px;border-radius:8px}
+.okbox{background:#052e1a;border:1px solid #114d2a;color:#b3f7c1}
+.errbox{background:#3b0d0d;border:1px solid #5b1919;color:#ffd0d0}
+.warnbox{background:#3a2903;border:1px solid #5c4307;color:#ffe6b0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Inventário de Criatividade (REISMAN_CREATIVITY_ASSESSMENT) – Versão Pais</h1>
+    <p class="muted">
+      Para cada afirmação, marque o grau de observação do comportamento da criança.  
+      As opções são: <b>Nunca observado</b>, <b>Raramente observado</b>,  
+      <b>Observado às vezes</b>, <b>Frequentemente observado</b> e <b>Sempre observado</b>.
+    </p>
+
+    <div id="pacInfo" class="grid-info" style="display:none;"></div>
+
+    <form id="form" style="display:none;">
+      <div id="qs"></div>
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <button id="btnSubmit" class="btn" type="submit">Enviar respostas</button>
+        <div id="progress" class="muted"></div>
+      </div>
+      <div id="msg" class="msg" style="display:none"></div>
+    </form>
+
+    <div id="alert" class="msg" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+// =============================
+// CONFIGURAÇÃO GERAL – CRIATIVIDADE
+// =============================
+const SHEETDB_BASE = "https://sheetdb.io/api/v1/8pmdh33s9fvy8";
+const SHEETS = {
+  PATIENTS: "Patients",
+  TOKENS: "LinkTokens",
+  SCORES: "Scores_REISMAN_CREATIVITY_ASSESSMENT_PAIS"
+};
+const CODE = "REISMAN_CREATIVITY_ASSESSMENT_PAIS";
+const SOURCE = "pais/cuidadores";
+const PORTAL_URL = "https://integradaneuropsicologia.github.io/formularios/";
+
+const $ = s => document.querySelector(s);
+const qs = k => new URLSearchParams(location.search).get(k) || "";
+const onlyDigits = s => (s || "").replace(/\D+/g,"");
+const AUTOSAVE_KEY = `${CODE}_${qs("token") || "no_token"}`;
+
+// =============================
+// FUNÇÕES AUXILIARES
+// =============================
+function setBox(id, text, kind="ok"){
+  const el = $(id); if(!el) return;
+  el.textContent = text;
+  el.className = "msg " + (kind==="ok" ? "okbox" : kind==="warn" ? "warnbox" : "errbox");
+  el.style.display = "block";
+}
+function hideBox(id){const el=$(id);if(el){el.style.display="none";el.textContent="";}}
+function fmtDateISO(iso){
+  if(!iso) return "";
+  const [y,m,d] = iso.split("-");
+  return (y&&m&&d)?`${d}/${m}/${y}`:iso;
+}
+async function GET(url){const r=await fetch(url);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}
+async function POST(url,body){
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
+}
+async function PATCH(url,body){
+  const r=await fetch(url,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
+}
+async function sheetSearch(sheet,params){
+  const usp=new URLSearchParams(params);
+  return GET(`${SHEETDB_BASE}/search?sheet=${encodeURIComponent(sheet)}&${usp.toString()}`);
+}
+async function sheetCreate(sheet,row){
+  return POST(`${SHEETDB_BASE}?sheet=${encodeURIComponent(sheet)}`,{data:[row]});
+}
+async function sheetPatchBy(sheet,col,val,data){
+  return PATCH(`${SHEETDB_BASE}/${encodeURIComponent(col)}/${encodeURIComponent(val)}?sheet=${encodeURIComponent(sheet)}`,{data});
+}
+function goPortalWithToken(){
+  const TOKEN=qs("token");
+  try{
+    const u=new URL(PORTAL_URL,location.href);
+    u.searchParams.set("token",TOKEN);
+    location.href=u.toString();
+  }catch(_){
+    const sep=PORTAL_URL.includes("?")?"&":"?";
+    location.href=PORTAL_URL+sep+"token="+encodeURIComponent(TOKEN);
+  }
+}
+
+// =============================
+// VARIÁVEIS GLOBAIS
+// =============================
+let patient=null;
+let CPF="";
+let startAt=Date.now();
+
+// =============================
+// INICIALIZAÇÃO (BOOT)
+// =============================
+(async function boot(){
+  try{
+    const TOKEN=qs("token");
+    if(!TOKEN){setBox("#alert","Link inválido (sem token).","err");return;}
+    const trows=await sheetSearch(SHEETS.TOKENS,{token:TOKEN});
+    if(!trows?.length)throw new Error("Token inválido ou expirado.");
+    const tokenRow=trows[0];
+    const disabled=String(tokenRow.disabled||"não").toLowerCase()==="sim";
+    const expired=tokenRow.expires_at&&(Date.parse(tokenRow.expires_at)<Date.now());
+    if(disabled||expired)throw new Error("Token desativado/expirado.");
+
+    CPF=onlyDigits(tokenRow.cpf||"");
+    if(!CPF)throw new Error("Token sem CPF vinculado.");
+    const prows=await sheetSearch(SHEETS.PATIENTS,{cpf:CPF});
+    if(!prows?.length)throw new Error("Aluno não encontrado.");
+    patient=prows[0];
+    const allowed=String(patient[CODE]||"").toLowerCase()==="sim";
+    if(!allowed){setBox("#alert","Formulário não liberado para este aluno.","err");return;}
+
+    const already=await sheetSearch(SHEETS.SCORES,{cpf:CPF,code:CODE});
+    const flagDone=String(patient[`${CODE}_FEITO`]||"").toLowerCase()==="sim";
+    if(already?.length||flagDone){
+      setBox("#alert","Formulário já respondido. Voltando ao portal…","ok");
+      setTimeout(goPortalWithToken,1200);
+      return;
+    }
+    renderPatientInfo();
+    $("#form").style.display="block";
+    $("#pacInfo").style.display="grid";
+    hideBox("#alert");
+    startAt=Date.now();
+  }catch(err){
+    console.error(err);
+    setBox("#alert",err.message||"Falha ao abrir o formulário.","err");
+  }
+})();
+
+function renderPatientInfo(){
+  const g=$("#pacInfo");
+  g.innerHTML="";
+  const info=[["Nome",patient.nome||"-"],["Nascimento",fmtDateISO(patient.data_nascimento)]];
+  for(const [k,v]of info){
+    const d=document.createElement("div");
+    d.className="info";
+    d.innerHTML=`<b>${k}</b><div>${v||"-"}</div>`;
+    g.appendChild(d);
+  }
+}
+
+
+
+// =============================
+// PARTE 2 – PERGUNTAS E LÓGICA DO INVENTÁRIO DE CRIATIVIDADE
+// =============================
+
+// --- Lista de perguntas agrupadas por dimensão ---
+const DIMENSIONS = {
+  "Fluência de Ideias": [
+    "Gera um grande número de ideias ao tentar resolver um problema.",
+    "Consegue listar várias maneiras de usar um objeto comum.",
+    "Apresenta novas ideias para melhorar atividades cotidianas.",
+    "Cria histórias, personagens ou cenários originais durante atividades lúdicas.",
+    "Consegue pensar em diversas soluções quando enfrenta um desafio."
+  ],
+  "Flexibilidade de Pensamento": [
+    "Demonstra capacidade de mudar de abordagem quando confrontado com um obstáculo.",
+    "Faz perguntas que exploram diferentes ângulos de um problema ou situação.",
+    "Aplica conhecimentos de uma área em outra disciplina ou contexto.",
+    "Combina informações de diferentes fontes para criar algo novo e inovador.",
+    "Demonstra abertura para considerar ideias e opiniões diversas."
+  ],
+  "Originalidade": [
+    "Apresenta respostas únicas e inovadoras para problemas comuns.",
+    "Propõe maneiras inusitadas de realizar tarefas diárias.",
+    "Demonstra capacidade de pensar 'fora da caixa' e propor ideias não convencionais.",
+    "Cria produtos, textos ou desenhos que são diferentes do habitual.",
+    "Participa de atividades artísticas ou criativas com ideias originais e inovadoras."
+  ],
+  "Elaboração": [
+    "Elabora suas ideias com detalhes e explicações adicionais.",
+    "Cria desenhos, textos ou produtos com muitos detalhes e informações.",
+    "Desenvolve narrativas ou argumentos com raciocínios lógicos e completos.",
+    "Faz perguntas que levam a uma compreensão mais profunda de um tópico.",
+    "Consegue conectar várias ideias em uma única resposta elaborada e coerente."
+  ],
+  "Sensibilidade a Problemas": [
+    "Identifica problemas ou inconsistências em situações cotidianas.",
+    "Demonstra habilidade para antecipar problemas potenciais antes que eles ocorram.",
+    "Percebe oportunidades de melhoria ou inovação em situações comuns.",
+    "Faz perguntas para entender as causas profundas de um problema.",
+    "Propõe soluções para problemas identificados em ambientes sociais ou acadêmicos."
+  ]
+};
+
+// --- Opções de resposta e pontuação ---
+const OPTIONS = [
+  { label: "Nunca observado", value: 0 },
+  { label: "Raramente observado", value: 2 },
+  { label: "Observado às vezes", value: 3 },
+  { label: "Frequentemente observado", value: 4 },
+  { label: "Sempre observado", value: 5 }
+];
+
+// --- Renderização das perguntas ---
+function renderQuestions(){
+  const host = $("#qs");
+  host.innerHTML = "";
+  let count = 0;
+
+  Object.entries(DIMENSIONS).forEach(([dim, items]) => {
+    items.forEach(q => {
+      count++;
+      const qn = String(count).padStart(3, "0");
+      const wrap = document.createElement("div");
+      wrap.className = "q";
+      wrap.innerHTML = `<h3>${count}. ${q}</h3>`;
+      const opts = document.createElement("div");
+      opts.className = "opts";
+
+      OPTIONS.forEach((opt, i) => {
+        const id = `q${qn}_${i}`;
+        const l = document.createElement("label");
+        l.className = "opt";
+        l.innerHTML = `<input type="radio" name="q${qn}" id="${id}" value="${opt.value}" required><span>${opt.label}</span>`;
+        opts.appendChild(l);
+      });
+
+      wrap.appendChild(opts);
+      host.appendChild(wrap);
+    });
+  });
+
+  const updateProg = () => {
+    let answered = 0;
+    for (let i = 1; i <= count; i++) {
+      const qn = String(i).padStart(3, "0");
+      if (document.querySelector(`input[name="q${qn}"]:checked`)) answered++;
+    }
+    $("#progress").textContent = `${answered}/${count} respondidas`;
+  };
+
+  host.addEventListener("change", () => { updateProg(); autosaveAnswers(); });
+  updateProg();
+}
+renderQuestions();
+
+// --- Autosave local ---
+function autosaveAnswers() {
+  const stored = {};
+  const totalQs = Object.values(DIMENSIONS).flat().length;
+  for (let i = 1; i <= totalQs; i++) {
+    const qn = String(i).padStart(3, "0");
+    const sel = document.querySelector(`input[name="q${qn}"]:checked`);
+    if (sel) stored[i] = sel.value;
+  }
+  localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(stored));
+}
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([k, v]) => {
+      const qn = String(k).padStart(3, "0");
+      const el = document.querySelector(`input[name="q${qn}"][value="${v}"]`);
+      if (el) el.checked = true;
+    });
+  } catch (_) {}
+}
+restoreAutosave();
+
+// --- Envio ---
+let sending = false;
+$("#form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (sending) return;
+  sending = true;
+  hideBox("#msg");
+  const btn = $("#btnSubmit");
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Enviando…";
+
+  try {
+    const allQuestions = Object.values(DIMENSIONS).flat();
+    const answers = {};
+    for (let i = 0; i < allQuestions.length; i++) {
+      const qn = String(i + 1).padStart(3, "0");
+      const sel = document.querySelector(`input[name="q${qn}"]:checked`);
+      answers[i + 1] = sel ? Number(sel.value) : null;
+    }
+
+    // Cálculo por dimensão
+    const scores = {};
+    let total = 0;
+    let index = 1;
+    Object.entries(DIMENSIONS).forEach(([dim, items]) => {
+      let dimSum = 0;
+      items.forEach(() => {
+        const v = answers[index];
+        if (v != null) dimSum += v;
+        index++;
+      });
+      scores[dim] = dimSum;
+      total += dimSum;
+    });
+
+    // Interpretação geral
+    let interpret = "";
+    if (total >= 100) interpret = "Perfil altamente criativo, com forte capacidade de gerar ideias originais e explorar diferentes abordagens para resolver problemas. Sugere grande potencial criativo em múltiplas áreas.";
+    else if (total >= 75) interpret = "Indica um bom nível de criatividade, com habilidades que se destacam em algumas dimensões específicas.";
+    else if (total >= 50) interpret = "Criatividade dentro do esperado para a faixa etária, com algumas áreas que podem se beneficiar de estímulo adicional.";
+    else interpret = "Sugere dificuldades em algumas áreas criativas. Recomendado um acompanhamento mais detalhado e atividades que estimulem a exploração de novas ideias e possibilidades.";
+
+    // Monta string das respostas
+    const questionsStr = allQuestions.map((txt, idx) => {
+      const ans = answers[idx + 1];
+      const label = OPTIONS.find(o => o.value == ans)?.label || "Sem resposta";
+      return `${idx + 1}. ${txt} => ${label}`;
+    }).join(" | ");
+
+    const durationSec = Math.round((Date.now() - startAt) / 1000);
+    const row = {
+      result_id: `${patient.cpf}_${CODE}_${Date.now()}`,
+      token: qs("token"),
+      cpf: patient.cpf,
+      code: CODE,
+      source: SOURCE,
+      submitted_at: new Date().toISOString(),
+      questions: questionsStr,
+      categoria: `Pontuações: ${Object.entries(scores).map(([k,v]) => `${k}: ${v}`).join(" | ")} | Total: ${total} | Interpretação: ${interpret}`,
+      metrics: JSON.stringify({ scores, total, answers, duration_sec: durationSec })
+    };
+
+    await sheetCreate(SHEETS.SCORES, row);
+    await sheetPatchBy(SHEETS.PATIENTS, "cpf", patient.cpf, {
+      [`${CODE}_FEITO`]: "sim",
+      [`${CODE}_FEITO_AT`]: new Date().toISOString()
+    });
+    localStorage.removeItem(AUTOSAVE_KEY);
+    setBox("#msg", "Formulário enviado com sucesso. Retornando ao portal…", "ok");
+    setTimeout(goPortalWithToken, 1500);
+  } catch (err) {
+    console.error(err);
+    setBox("#msg", err.message || "Falha ao enviar. Tente novamente.", "err");
+    sending = false;
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+
+</script>
+</body>
+</html>
