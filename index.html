@@ -1,119 +1,213 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Inventário de Criatividade (REISMAN_CREATIVITY_ASSESSMENT) - Versão pais</title>
-<meta name="description" content="Inventário de Criatividade – Versão Observacional para pais. Integrada Neuropsicologia.">
 <style>
-:root{
-  --bg:#0f172a;
-  --card:#111827;
-  --line:#1f2937;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-  --pri:#4f46e5;
-  --ok:#22c55e;
-  --err:#ef4444;
-  --chip:#0b1220;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:var(--bg);
+  /* TEMA CLARO (padrão) */
+  :root{
+    --bg:#f3f4f6;
+    --card:#ffffff;
+    --line:#d1d5db;
+    --text:#111827;
+    --muted:#6b7280;
+    --pri:#4f46e5;
+    --ok:#16a34a;
+    --err:#dc2626;
+
+    --info-bg:#f9fafb;
+    --q-bg:#f9fafb;
+    --field-bg:#ffffff;
+    --legend-bg:#eef2ff;
+
+    --okbox-bg:#ecfdf3;
+    --okbox-border:#bbf7d0;
+    --okbox-text:#166534;
+
+    --errbox-bg:#fef2f2;
+    --errbox-border:#fecaca;
+    --errbox-text:#7f1d1d;
+
+    --warnbox-bg:#fffbeb;
+    --warnbox-border:#facc15;
+    --warnbox-text:#78350f;
+  }
+
+  /* TEMA ESCURO */
+  :root[data-theme="dark"]{
+    --bg:#0f172a;
+    --card:#111827;
+    --line:#1f2937;
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --pri:#4f46e5;
+    --ok:#22c55e;
+    --err:#ef4444;
+
+    --info-bg:#0b1220;
+    --q-bg:#0b1220;
+    --field-bg:#0a0f1c;
+    --legend-bg:#0b1220;
+
+    --okbox-bg:#052e1a;
+    --okbox-border:#114d2a;
+    --okbox-text:#b3f7c1;
+
+    --errbox-bg:#3b0d0d;
+    --errbox-border:#5b1919;
+    --errbox-text:#ffd0d0;
+
+    --warnbox-bg:#3a2903;
+    --warnbox-border:#5c4307;
+    --warnbox-text:#ffe6b0;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto
+  }
+  .wrap{max-width:1000px;margin:24px auto;padding:0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  h1{margin:0 0 6px;font-size:1.35rem}
+  .muted{color:var(--muted)}
+
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .grid-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 6px}
+  @media(max-width:720px){.grid-info{grid-template-columns:1fr}}
+
+  .info{
+    background:var(--info-bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px
+  }
+  .info b{display:block;margin-bottom:4px}
+
+  .q{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    background:var(--q-bg);
+    margin-bottom:10px
+  }
+  .q h3{margin:0 0 8px;font-size:1rem}
+
+  textarea{
+    width:100%;
+    min-height:80px;
+    resize:vertical;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--field-bg);
+    color:var(--text);
+    padding:10px
+  }
+
+  input.field-input{
+  width:100%;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--field-bg);
   color:var(--text);
-  font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+  padding:8px 10px;
 }
-.wrap{
-  max-width:1000px;
-  margin:24px auto;
-  padding:0 16px;
+
+/* o estilo do “pontinho” vale também para checkbox */
+.opt input[type="radio"],
+.opt input[type="checkbox"]{
+  accent-color:var(--pri);
 }
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:20px;
-  box-shadow:0 0 10px #0004;
+
+
+  .hint{font-size:.9rem;color:var(--muted);margin-bottom:8px}
+  .opts{display:flex;flex-wrap:wrap;gap:10px}
+  label.opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+  .opt input[type="radio"]{accent-color:var(--pri)}
+  label.opt:has(input[type="radio"]:checked){
+    background:var(--pri);
+    border-color:var(--pri);
+    color:#fff;
+  }
+  label.opt:has(input[type="radio"]:checked) span{
+    color:#fff;
+    font-weight:600;
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--pri);
+    border:none;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:.9rem;
+  }
+  .btn.ok{background:var(--ok)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+
+  /* botão de tema: estilo mais “neutro” */
+  .btn-toggle{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--line);
+    padding:6px 10px;
+  }
+
+  .msg{margin:10px 0;padding:10px;border-radius:8px}
+  .okbox{background:var(--okbox-bg);border:1px solid var(--okbox-border);color:var(--okbox-text)}
+  .errbox{background:var(--errbox-bg);border:1px solid var(--errbox-border);color:var(--errbox-text)}
+  .warnbox{background:var(--warnbox-bg);border:1px solid var(--warnbox-border);color:var(--warnbox-text)}
+
+  .legend{
+    background:var(--legend-bg);
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:10px;
+    margin:6px 0 12px
+  }
+
+  .q.missing{
+  border-color: var(--err);
+  box-shadow: 0 0 0 1px var(--err);
 }
-h1{font-size:1.35rem;margin-bottom:4px}
-.muted{color:var(--muted)}
-.grid-info{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin:16px 0;
-}
-@media(max-width:720px){.grid-info{grid-template-columns:1fr}}
-.info{
-  background:var(--chip);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:10px;
-}
-.info b{display:block;color:#cbd5e1;margin-bottom:4px}
-.q{
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--chip);
-  padding:12px;
-  margin-bottom:10px;
-}
-.q h3{margin:0 0 6px;font-size:.95rem}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-label.opt{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:#111827;
-  border:1px solid #1f2937;
-  border-radius:9px;
-  padding:6px 10px;
-  cursor:pointer;
-}
-label.opt:has(input[type="radio"]:checked){
-  background:var(--pri);
-  border-color:var(--pri);
-  color:#fff;
-}
-label.opt input{accent-color:var(--pri)}
-.btn{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  background:var(--ok);
-  border:none;
-  border-radius:10px;
-  color:#fff;
-  padding:10px 14px;
-  cursor:pointer;
-  font-weight:600;
-}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.msg{margin:10px 0;padding:10px;border-radius:8px}
-.okbox{background:#052e1a;border:1px solid #114d2a;color:#b3f7c1}
-.errbox{background:#3b0d0d;border:1px solid #5b1919;color:#ffd0d0}
-.warnbox{background:#3a2903;border:1px solid #5c4307;color:#ffe6b0}
+
 </style>
+
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <h1>Inventário de Criatividade (REISMAN_CREATIVITY_ASSESSMENT) – Versão Pais</h1>
-    <p class="muted">
-      Para cada afirmação, marque o grau de observação do comportamento da criança.  
-      As opções são: <b>Nunca observado</b>, <b>Raramente observado</b>,  
-      <b>Observado às vezes</b>, <b>Frequentemente observado</b> e <b>Sempre observado</b>.
-    </p>
+  <div class="header">
+  <h1>Inventário de Criatividade (REISMAN_CREATIVITY_ASSESSMENT) - Versão pais</h1>
+  <button id="themeToggle" type="button" class="btn btn-toggle">
+    Modo escuro
+  </button>
+</div>
 
+    
+    <!-- Dados do paciente (por token) -->
     <div id="pacInfo" class="grid-info" style="display:none;"></div>
 
-    <form id="form" style="display:none;">
+    <form id="form" style="margin-top:14px; display:none;">
       <div id="qs"></div>
-      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-        <button id="btnSubmit" class="btn" type="submit">Enviar respostas</button>
+
+      <div class="legend muted">Dica: responda livremente; o rascunho é salvo automaticamente neste dispositivo.</div>
+
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+        <button id="btnSubmit" class="btn ok" type="submit">Enviar formulário</button>
         <div id="progress" class="muted"></div>
       </div>
       <div id="msg" class="msg" style="display:none"></div>
@@ -124,314 +218,500 @@ label.opt input{accent-color:var(--pri)}
 </div>
 
 <script>
-// =============================
-// CONFIGURAÇÃO GERAL – CRIATIVIDADE
-// =============================
-const SHEETDB_BASE = "https://sheetdb.io/api/v1/8pmdh33s9fvy8";
-const SHEETS = {
-  PATIENTS: "Patients",
-  TOKENS: "LinkTokens",
-  SCORES: "Scores_REISMAN_CREATIVITY_ASSESSMENT_PAIS"
-};
-const CODE = "REISMAN_CREATIVITY_ASSESSMENT_PAIS";
-const SOURCE = "pais/cuidadores";
-const PORTAL_URL = "https://integradaneuropsicologia.github.io/formularios/";
+// ======== CONFIG ========
+// ======== TEMA CLARO/ESCURO ========
+const THEME_KEY = "THEME_REISMAN_CREATIVITY_ASSESSMENT_PAIS";
 
-const $ = s => document.querySelector(s);
-const qs = k => new URLSearchParams(location.search).get(k) || "";
-const onlyDigits = s => (s || "").replace(/\D+/g,"");
-const AUTOSAVE_KEY = `${CODE}_${qs("token") || "no_token"}`;
+function applyTheme(theme){
+  const root = document.documentElement;
+  if (theme === "dark") {
+    root.setAttribute("data-theme","dark");
+  } else {
+    root.removeAttribute("data-theme"); // volta pro claro
+    theme = "light";
+  }
+  localStorage.setItem(THEME_KEY, theme);
 
-// =============================
-// FUNÇÕES AUXILIARES
-// =============================
-function setBox(id, text, kind="ok"){
-  const el = $(id); if(!el) return;
-  el.textContent = text;
-  el.className = "msg " + (kind==="ok" ? "okbox" : kind==="warn" ? "warnbox" : "errbox");
-  el.style.display = "block";
-}
-function hideBox(id){const el=$(id);if(el){el.style.display="none";el.textContent="";}}
-function fmtDateISO(iso){
-  if(!iso) return "";
-  const [y,m,d] = iso.split("-");
-  return (y&&m&&d)?`${d}/${m}/${y}`:iso;
-}
-async function GET(url){const r=await fetch(url);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}
-async function POST(url,body){
-  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  if(!r.ok)throw new Error(await r.text());
-  return r.json();
-}
-async function PATCH(url,body){
-  const r=await fetch(url,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  if(!r.ok)throw new Error(await r.text());
-  return r.json();
-}
-async function sheetSearch(sheet,params){
-  const usp=new URLSearchParams(params);
-  return GET(`${SHEETDB_BASE}/search?sheet=${encodeURIComponent(sheet)}&${usp.toString()}`);
-}
-async function sheetCreate(sheet,row){
-  return POST(`${SHEETDB_BASE}?sheet=${encodeURIComponent(sheet)}`,{data:[row]});
-}
-async function sheetPatchBy(sheet,col,val,data){
-  return PATCH(`${SHEETDB_BASE}/${encodeURIComponent(col)}/${encodeURIComponent(val)}?sheet=${encodeURIComponent(sheet)}`,{data});
-}
-function goPortalWithToken(){
-  const TOKEN=qs("token");
-  try{
-    const u=new URL(PORTAL_URL,location.href);
-    u.searchParams.set("token",TOKEN);
-    location.href=u.toString();
-  }catch(_){
-    const sep=PORTAL_URL.includes("?")?"&":"?";
-    location.href=PORTAL_URL+sep+"token="+encodeURIComponent(TOKEN);
+  const btn = document.getElementById("themeToggle");
+  if (btn) {
+    btn.textContent = (theme === "dark") ? "Modo claro" : "Modo escuro";
   }
 }
 
-// =============================
-// VARIÁVEIS GLOBAIS
-// =============================
-let patient=null;
-let CPF="";
-let startAt=Date.now();
+// inicializa tema e listener do botão
+(function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || "light";
+  applyTheme(saved);
 
-// =============================
-// INICIALIZAÇÃO (BOOT)
-// =============================
+  const btn = document.getElementById("themeToggle");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+  }
+})();
+
+
+
+const SHEETDB_BASE = "https://sheetdb.io/api/v1/8pmdh33s9fvy8";
+const SHEETS = { PATIENTS:"Patients", TOKENS:"LinkTokens", SCORES:"Scores_REISMAN_CREATIVITY_ASSESSMENT_PAIS" };
+const CODE = "REISMAN_CREATIVITY_ASSESSMENT_PAIS";
+const PORTAL_URL = "https://integradaneuropsicologia.github.io/formularios/";
+
+// ======== HELPERS ========
+const $ = s => document.querySelector(s);
+const onlyDigits = s => (s||"").replace(/\D+/g,"");
+const qs = k => new URLSearchParams(location.search).get(k) || "";
+const AUTOSAVE_KEY = `${CODE}_${qs("token")||"no_token"}`;
+
+function setBox(id, text, kind="ok"){ const el=$(id); if(!el) return;
+  el.textContent=text; el.className="msg "+(kind==="ok"?"okbox":kind==="warn"?"warnbox":"errbox"); el.style.display="block";
+}
+function hideBox(id){ const el=$(id); if(el){ el.style.display="none"; el.textContent=""; } }
+function maskCPF(cpf){ const d=onlyDigits(cpf||""); if(d.length!==11) return cpf||""; return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}`; }
+function fmtDateISO(iso){ if(!iso) return ""; const [y,m,d]=iso.split("-"); return (y&&m&&d)?`${d}/${m}/${y}`:iso; }
+async function GET(url){ const r=await fetch(url); if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); }
+async function POST(url, body){ const r=await fetch(url,{method:"POST",headers:{ "Content-Type":"application/json" },body:JSON.stringify(body)}); if(!r.ok) throw new Error(await r.text()); return r.json(); }
+async function PATCH(url, body){ const r=await fetch(url,{method:"PATCH",headers:{ "Content-Type":"application/json" },body:JSON.stringify(body)}); if(!r.ok) throw new Error(await r.text()); return r.json(); }
+async function sheetSearch(sheet, params){ const usp=new URLSearchParams(params); return GET(`${SHEETDB_BASE}/search?sheet=${encodeURIComponent(sheet)}&${usp.toString()}`); }
+async function sheetCreate(sheet, row){ return POST(`${SHEETDB_BASE}?sheet=${encodeURIComponent(sheet)}`, { data:[row] }); }
+async function sheetPatchBy(sheet, column, value, data){ return PATCH(`${SHEETDB_BASE}/${encodeURIComponent(column)}/${encodeURIComponent(value)}?sheet=${encodeURIComponent(sheet)}`, { data }); }
+function goPortalWithToken(){ const TOKEN=qs("token"); try{ const u=new URL(PORTAL_URL,location.href); u.searchParams.set("token",TOKEN); location.href=u.toString(); }catch(_){ const sep=PORTAL_URL.includes("?")?"&":"?"; location.href=PORTAL_URL+sep+"token="+encodeURIComponent(TOKEN); }}
+
+// ======== PERGUNTAS ========
+// Escalas padrão
+const FREQ5   = ["Nunca","Raramente","Às vezes","Frequentemente","Quase sempre"];
+const SEVER4  = ["Não","Leve","Moderada","Grave"];
+const YESNO   = ["Sim","Não"];
+const YNP     = ["Sim","Não","Não sei"];
+
+
+const QUESTIONS = [
+
+  // ===============================
+  // FLUÊNCIA DE IDEIAS
+  // ===============================
+  { type:"section", text:"Fluência de Ideias" },
+
+  { type:"radio", text:"Gera um grande número de ideias ao tentar resolver um problema.", options: FREQ5 },
+  { type:"radio", text:"Consegue listar várias maneiras de usar um objeto comum.", options: FREQ5 },
+  { type:"radio", text:"Apresenta novas ideias para melhorar atividades cotidianas.", options: FREQ5 },
+  { type:"radio", text:"Cria histórias, personagens ou cenários originais durante atividades lúdicas.", options: FREQ5 },
+  { type:"radio", text:"Consegue pensar em diversas soluções quando enfrenta um desafio.", options: FREQ5 },
+
+  // ===============================
+  // FLEXIBILIDADE DE PENSAMENTO
+  // ===============================
+  { type:"section", text:"Flexibilidade de Pensamento" },
+
+  { type:"radio", text:"Demonstra capacidade de mudar de abordagem quando confrontado com um obstáculo.", options: FREQ5 },
+  { type:"radio", text:"Faz perguntas que exploram diferentes ângulos de um problema ou situação.", options: FREQ5 },
+  { type:"radio", text:"Aplica conhecimentos de uma área em outra disciplina ou contexto.", options: FREQ5 },
+  { type:"radio", text:"Combina informações de diferentes fontes para criar algo novo e inovador.", options: FREQ5 },
+  { type:"radio", text:"Demonstra abertura para considerar ideias e opiniões diversas.", options: FREQ5 },
+
+  // ===============================
+  // ORIGINALIDADE
+  // ===============================
+  { type:"section", text:"Originalidade" },
+
+  { type:"radio", text:"Apresenta respostas únicas e inovadoras para problemas comuns.", options: FREQ5 },
+  { type:"radio", text:"Propõe maneiras inusitadas de realizar tarefas diárias.", options: FREQ5 },
+  { type:"radio", text:"Demonstra capacidade de pensar 'fora da caixa' e propor ideias não convencionais.", options: FREQ5 },
+  { type:"radio", text:"Cria produtos, textos ou desenhos que são diferentes do habitual.", options: FREQ5 },
+  { type:"radio", text:"Participa de atividades artísticas ou criativas com ideias originais e inovadoras.", options: FREQ5 },
+
+  // ===============================
+  // ELABORAÇÃO
+  // ===============================
+  { type:"section", text:"Elaboração" },
+
+  { type:"radio", text:"Elabora suas ideias com detalhes e explicações adicionais.", options: FREQ5 },
+  { type:"radio", text:"Cria desenhos, textos ou produtos com muitos detalhes e informações.", options: FREQ5 },
+  { type:"radio", text:"Desenvolve narrativas ou argumentos com raciocínios lógicos e completos.", options: FREQ5 },
+  { type:"radio", text:"Faz perguntas que levam a uma compreensão mais profunda de um tópico.", options: FREQ5 },
+  { type:"radio", text:"Consegue conectar várias ideias em uma única resposta elaborada e coerente.", options: FREQ5 },
+
+  // ===============================
+  // SENSIBILIDADE A PROBLEMAS
+  // ===============================
+  { type:"section", text:"Sensibilidade a Problemas" },
+
+  { type:"radio", text:"Identifica problemas ou inconsistências em situações cotidianas.", options: FREQ5 },
+  { type:"radio", text:"Demonstra habilidade para antecipar problemas potenciais antes que eles ocorram.", options: FREQ5 },
+  { type:"radio", text:"Percebe oportunidades de melhoria ou inovação em situações comuns.", options: FREQ5 },
+  { type:"radio", text:"Faz perguntas para entender as causas profundas de um problema.", options: FREQ5 },
+  { type:"radio", text:"Propõe soluções para problemas identificados em ambientes sociais ou acadêmicos.", options: FREQ5 }
+
+];
+
+const N = QUESTIONS.length;
+
+// ======== RENDER ========
+function renderQuestions(){
+  const host = $("#qs"); 
+  host.innerHTML = "";
+
+  QUESTIONS.forEach((q, idx)=>{
+    const n  = idx+1;
+    const qn = String(n).padStart(2,"0");
+    const wrap = document.createElement("div");
+    wrap.className = "q";
+
+    if (typeof q === "string") {
+      // textarea “livre”
+      wrap.innerHTML = `
+        <h3 id="lbl${qn}">${n}. ${q}</h3>
+        <textarea name="q${qn}" id="q${qn}" placeholder="Escreva aqui..."></textarea>
+      `;
+    } else if (q.type === "radio" || q.type === "checkbox") {
+      // grupo de radios ou checkboxes
+      const opts = q.options || [];
+      let html = `<h3 id="lbl${qn}">${n}. ${q.text}</h3><div class="opts">`;
+      opts.forEach((opt, i)=>{
+        const id = `q${qn}_${i}`;
+        html += `
+          <label class="opt">
+            <input type="${q.type}" name="q${qn}" id="${id}" value="${opt}">
+            <span>${opt}</span>
+          </label>`;
+      });
+      html += `</div>`;
+      wrap.innerHTML = html;
+    } else if (q.type === "input") {
+      // campo de texto simples
+      wrap.innerHTML = `
+        <h3 id="lbl${qn}">${n}. ${q.text}</h3>
+        <input type="text" name="q${qn}" id="q${qn}" class="field-input" />
+      `;
+    } else {
+      // fallback, se aparecer algum tipo não tratado
+      wrap.innerHTML = `
+        <h3 id="lbl${qn}">${n}. ${q.text || q}</h3>
+        <textarea name="q${qn}" id="q${qn}" placeholder="Escreva aqui..."></textarea>
+      `;
+    }
+
+    host.appendChild(wrap);
+  });
+
+  // autosize + progresso
+  host.addEventListener("input", e=>{
+    if(e.target.tagName==="TEXTAREA"){
+      e.target.style.height="auto";
+      e.target.style.height=(e.target.scrollHeight+2)+"px";
+    }
+    updateProg(); 
+    autosaveAnswers();
+  });
+  host.addEventListener("change", ()=>{
+    updateProg(); 
+    autosaveAnswers();
+  });
+
+  updateProg();
+}
+
+
+function updateProg(){
+  let filled = 0;
+
+  QUESTIONS.forEach((q, idx)=>{
+    const qn = `q${String(idx+1).padStart(2,"0")}`;
+
+    if (typeof q === "string") {
+      const el = $("#"+qn);
+      if (el && el.value.trim()) filled++;
+
+    } else if (q.type === "radio" || q.type === "checkbox") {
+      const any = document.querySelectorAll(`input[name="${qn}"]:checked`).length > 0;
+      if (any) filled++;
+
+    } else if (q.type === "input") {
+      const el = $("#"+qn);
+      if (el && el.value.trim()) filled++;
+    }
+  });
+
+  $("#progress").textContent = `${filled}/${N} respondidas`;
+}
+
+// ======== AUTOSAVE ========
+function autosaveAnswers(){
+  const answers  = {};
+  const qaPairs  = [];
+  let answeredCount = 0;
+
+  QUESTIONS.forEach((q, idx)=>{
+    const n  = idx+1;
+    const qn = `q${String(n).padStart(2,"0")}`;
+    const label = (typeof q === "string") ? q : (q.text || `Pergunta ${n}`);
+
+    if (typeof q === "string") {
+      // textarea
+      const el  = $("#"+qn);
+      const val = (el?.value || "").trim();
+      answers[qn] = val;
+      if (val) answeredCount++;
+      qaPairs.push(`${n}. ${label}: ${val ? val.replace(/\s+/g," ").trim() : "(sem resposta)"}`);
+
+    } else if (q.type === "radio") {
+      // radio -> uma opção (mas guardo como array pra manter padrão)
+      const vals = Array.from(document.querySelectorAll(`input[name="${qn}"]:checked`)).map(el=>el.value);
+      answers[qn] = vals;
+      if (vals.length) answeredCount++;
+      qaPairs.push(`${n}. ${label}: ${vals.length ? vals.join(", ") : "(nenhuma opção marcada)"}`);
+
+    } else if (q.type === "checkbox") {
+      // checkboxes -> várias opções
+      const vals = Array.from(document.querySelectorAll(`input[name="${qn}"]:checked`)).map(el=>el.value);
+      answers[qn] = vals;
+      if (vals.length) answeredCount++;
+      qaPairs.push(`${n}. ${label}: ${vals.length ? vals.join(", ") : "(nenhuma opção marcada)"}`);
+
+    } else if (q.type === "input") {
+      // input de texto simples
+      const el  = $("#"+qn);
+      const val = (el?.value || "").trim();
+      answers[qn] = val;
+      if (val) answeredCount++;
+      qaPairs.push(`${n}. ${label}: ${val ? val.replace(/\s+/g," ").trim() : "(sem resposta)"}`);
+    }
+  });
+
+  const categoria = qaPairs.join(" | ");
+
+  localStorage.setItem(
+    AUTOSAVE_KEY,
+    JSON.stringify({ code: CODE, token: qs("token"), answers })
+  );
+}
+
+
+function restoreAutosave(){
+  try{
+    const raw = localStorage.getItem(AUTOSAVE_KEY); 
+    if(!raw) return;
+
+    const {answers} = JSON.parse(raw) || {}; 
+    if(!answers) return;
+
+    Object.entries(answers).forEach(([key,val])=>{
+      if (Array.isArray(val)) {
+        // vale tanto pra radio quanto pra checkbox
+        val.forEach(v=>{
+          const el = document.querySelector(`input[name="${key}"][value="${v}"]`);
+          if (el) el.checked = true;
+        });
+      } else {
+        // textarea OU input
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = val;
+          if (el.tagName === "TEXTAREA") {
+            el.style.height = "auto";
+            el.style.height = (el.scrollHeight+2)+"px";
+          }
+        }
+      }
+    });
+
+    updateProg();
+  }catch(_){}
+}
+
+function clearAutosave(){ localStorage.removeItem(AUTOSAVE_KEY); }
+
+// ======== ESTADO ========
+let patient=null, tokenRow=null, CPF="";
+let startAt = Date.now();
+
+// ======== BOOT POR TOKEN ========
 (async function boot(){
   try{
     const TOKEN=qs("token");
-    if(!TOKEN){setBox("#alert","Link inválido (sem token).","err");return;}
-    const trows=await sheetSearch(SHEETS.TOKENS,{token:TOKEN});
-    if(!trows?.length)throw new Error("Token inválido ou expirado.");
-    const tokenRow=trows[0];
+    if(!TOKEN){ setBox("#alert","Link inválido (sem token). Solicite um novo link.","err"); return; }
+
+    const trows=await sheetSearch(SHEETS.TOKENS,{ token:TOKEN });
+    if(!trows?.length) throw new Error("Token inválido ou expirado.");
+    tokenRow=trows[0];
     const disabled=String(tokenRow.disabled||"não").toLowerCase()==="sim";
-    const expired=tokenRow.expires_at&&(Date.parse(tokenRow.expires_at)<Date.now());
-    if(disabled||expired)throw new Error("Token desativado/expirado.");
+    const expired = tokenRow.expires_at && (Date.parse(tokenRow.expires_at) < Date.now());
+    if(disabled || expired) throw new Error("Token desativado/expirado. Peça um novo link.");
 
-    CPF=onlyDigits(tokenRow.cpf||"");
-    if(!CPF)throw new Error("Token sem CPF vinculado.");
-    const prows=await sheetSearch(SHEETS.PATIENTS,{cpf:CPF});
-    if(!prows?.length)throw new Error("Aluno não encontrado.");
+    CPF=onlyDigits(tokenRow.cpf||""); if(!CPF) throw new Error("Token sem CPF vinculado.");
+
+    const prows=await sheetSearch(SHEETS.PATIENTS,{ cpf:CPF });
+    if(!prows?.length) throw new Error("Paciente não encontrado.");
     patient=prows[0];
-    const allowed=String(patient[CODE]||"").toLowerCase()==="sim";
-    if(!allowed){setBox("#alert","Formulário não liberado para este aluno.","err");return;}
 
-    const already=await sheetSearch(SHEETS.SCORES,{cpf:CPF,code:CODE});
+    const allowed=String(patient[CODE]||"").toLowerCase()==="sim";
+    if(!allowed){ setBox("#alert","Este formulário não está liberado para você. Entre em contato com o consultório.","err"); return; }
+
     const flagDone=String(patient[`${CODE}_FEITO`]||"").toLowerCase()==="sim";
-    if(already?.length||flagDone){
-      setBox("#alert","Formulário já respondido. Voltando ao portal…","ok");
-      setTimeout(goPortalWithToken,1200);
-      return;
+    const already=await sheetSearch(SHEETS.SCORES,{ cpf:CPF, code:CODE });
+    if(flagDone || (already && already.length)){
+      setBox("#alert","Você já respondeu este formulário. Voltando ao portal…","ok");
+      setTimeout(goPortalWithToken,1200); return;
     }
+
     renderPatientInfo();
-    $("#form").style.display="block";
+    renderQuestions();
     $("#pacInfo").style.display="grid";
+    $("#form").style.display="block";
     hideBox("#alert");
     startAt=Date.now();
+    restoreAutosave();
+
   }catch(err){
     console.error(err);
-    setBox("#alert",err.message||"Falha ao abrir o formulário.","err");
+    setBox("#alert", err.message || "Falha ao abrir o formulário. Tente novamente mais tarde.", "err");
   }
 })();
 
 function renderPatientInfo(){
-  const g=$("#pacInfo");
-  g.innerHTML="";
-  const info=[["Nome",patient.nome||"-"],["Nascimento",fmtDateISO(patient.data_nascimento)]];
-  for(const [k,v]of info){
-    const d=document.createElement("div");
-    d.className="info";
+  const g=$("#pacInfo"); g.innerHTML="";
+  const info=[["Nome",patient.nome||"-"],["CPF",maskCPF(patient.cpf)],["Nascimento",fmtDateISO(patient.data_nascimento)],["E-mail",patient.email||"-"],["WhatsApp",patient.whatsapp||"-"]];
+  for(const [k,v] of info){
+    const d=document.createElement("div"); d.className="info";
     d.innerHTML=`<b>${k}</b><div>${v||"-"}</div>`;
     g.appendChild(d);
   }
 }
 
-
-
-// =============================
-// PARTE 2 – PERGUNTAS E LÓGICA DO INVENTÁRIO DE CRIATIVIDADE
-// =============================
-
-// --- Lista de perguntas agrupadas por dimensão ---
-const DIMENSIONS = {
-  "Fluência de Ideias": [
-    "Gera um grande número de ideias ao tentar resolver um problema.",
-    "Consegue listar várias maneiras de usar um objeto comum.",
-    "Apresenta novas ideias para melhorar atividades cotidianas.",
-    "Cria histórias, personagens ou cenários originais durante atividades lúdicas.",
-    "Consegue pensar em diversas soluções quando enfrenta um desafio."
-  ],
-  "Flexibilidade de Pensamento": [
-    "Demonstra capacidade de mudar de abordagem quando confrontado com um obstáculo.",
-    "Faz perguntas que exploram diferentes ângulos de um problema ou situação.",
-    "Aplica conhecimentos de uma área em outra disciplina ou contexto.",
-    "Combina informações de diferentes fontes para criar algo novo e inovador.",
-    "Demonstra abertura para considerar ideias e opiniões diversas."
-  ],
-  "Originalidade": [
-    "Apresenta respostas únicas e inovadoras para problemas comuns.",
-    "Propõe maneiras inusitadas de realizar tarefas diárias.",
-    "Demonstra capacidade de pensar 'fora da caixa' e propor ideias não convencionais.",
-    "Cria produtos, textos ou desenhos que são diferentes do habitual.",
-    "Participa de atividades artísticas ou criativas com ideias originais e inovadoras."
-  ],
-  "Elaboração": [
-    "Elabora suas ideias com detalhes e explicações adicionais.",
-    "Cria desenhos, textos ou produtos com muitos detalhes e informações.",
-    "Desenvolve narrativas ou argumentos com raciocínios lógicos e completos.",
-    "Faz perguntas que levam a uma compreensão mais profunda de um tópico.",
-    "Consegue conectar várias ideias em uma única resposta elaborada e coerente."
-  ],
-  "Sensibilidade a Problemas": [
-    "Identifica problemas ou inconsistências em situações cotidianas.",
-    "Demonstra habilidade para antecipar problemas potenciais antes que eles ocorram.",
-    "Percebe oportunidades de melhoria ou inovação em situações comuns.",
-    "Faz perguntas para entender as causas profundas de um problema.",
-    "Propõe soluções para problemas identificados em ambientes sociais ou acadêmicos."
-  ]
-};
-
-// --- Opções de resposta e pontuação ---
-const OPTIONS = [
-  { label: "Nunca observado", value: 0 },
-  { label: "Raramente observado", value: 2 },
-  { label: "Observado às vezes", value: 3 },
-  { label: "Frequentemente observado", value: 4 },
-  { label: "Sempre observado", value: 5 }
-];
-
-// --- Renderização das perguntas ---
-function renderQuestions(){
-  const host = $("#qs");
-  host.innerHTML = "";
-  let count = 0;
-
-  Object.entries(DIMENSIONS).forEach(([dim, items]) => {
-    items.forEach(q => {
-      count++;
-      const qn = String(count).padStart(3, "0");
-      const wrap = document.createElement("div");
-      wrap.className = "q";
-      wrap.innerHTML = `<h3>${count}. ${q}</h3>`;
-      const opts = document.createElement("div");
-      opts.className = "opts";
-
-      OPTIONS.forEach((opt, i) => {
-        const id = `q${qn}_${i}`;
-        const l = document.createElement("label");
-        l.className = "opt";
-        l.innerHTML = `<input type="radio" name="q${qn}" id="${id}" value="${opt.value}" required><span>${opt.label}</span>`;
-        opts.appendChild(l);
-      });
-
-      wrap.appendChild(opts);
-      host.appendChild(wrap);
-    });
-  });
-
-  const updateProg = () => {
-    let answered = 0;
-    for (let i = 1; i <= count; i++) {
-      const qn = String(i).padStart(3, "0");
-      if (document.querySelector(`input[name="q${qn}"]:checked`)) answered++;
-    }
-    $("#progress").textContent = `${answered}/${count} respondidas`;
-  };
-
-  host.addEventListener("change", () => { updateProg(); autosaveAnswers(); });
-  updateProg();
-}
-renderQuestions();
-
-// --- Autosave local ---
-function autosaveAnswers() {
-  const stored = {};
-  const totalQs = Object.values(DIMENSIONS).flat().length;
-  for (let i = 1; i <= totalQs; i++) {
-    const qn = String(i).padStart(3, "0");
-    const sel = document.querySelector(`input[name="q${qn}"]:checked`);
-    if (sel) stored[i] = sel.value;
-  }
-  localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(stored));
-}
-function restoreAutosave() {
-  try {
-    const raw = localStorage.getItem(AUTOSAVE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    Object.entries(data).forEach(([k, v]) => {
-      const qn = String(k).padStart(3, "0");
-      const el = document.querySelector(`input[name="q${qn}"][value="${v}"]`);
-      if (el) el.checked = true;
-    });
-  } catch (_) {}
-}
-restoreAutosave();
-
-// --- Envio ---
-let sending = false;
-$("#form").addEventListener("submit", async e => {
+// ======== SUBMIT ========
+let sending=false;
+$("#form").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  if (sending) return;
-  sending = true;
+  if(sending) return; 
+  sending=true; 
   hideBox("#msg");
-  const btn = $("#btnSubmit");
-  const original = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = "Enviando…";
+  const btn=$("#btnSubmit"); 
+  const originalText=btn.textContent; 
+  btn.disabled=true; 
+  btn.textContent="Enviando…";
 
-  try {
-    const allQuestions = Object.values(DIMENSIONS).flat();
+  try{
+    if(!patient) throw new Error("Sessão inválida. Recarregue o link.");
+
     const answers = {};
-    for (let i = 0; i < allQuestions.length; i++) {
-      const qn = String(i + 1).padStart(3, "0");
-      const sel = document.querySelector(`input[name="q${qn}"]:checked`);
-      answers[i + 1] = sel ? Number(sel.value) : null;
+    const qaPairs = [];
+    let answeredCount = 0;
+
+    for (let i=1; i<=N; i++){
+      const q   = QUESTIONS[i-1];
+      const qn  = `q${String(i).padStart(2,"0")}`;
+      const label = (typeof q === "string") ? q : (q.text || `Pergunta ${i}`);
+
+      if (typeof q === "string"){
+        const el  = document.getElementById(qn);
+        const val = (el?.value || "").trim();
+        answers[qn] = val;
+        if (val) answeredCount++;
+        qaPairs.push(`${i}. ${label}: ${val ? val.replace(/\s+/g," ").trim() : "(sem resposta)"}`);
+
+      } else if (q.type === "radio"){
+        const checked = Array.from(document.querySelectorAll(`input[name="${qn}"]:checked`)).map(el=>el.value);
+        answers[qn] = checked;
+        if (checked.length) answeredCount++;
+        qaPairs.push(`${i}. ${label}: ${checked.length ? checked.join(", ") : "(nenhuma opção marcada)"}`);
+
+      } else if (q.type === "checkbox"){
+        const checked = Array.from(document.querySelectorAll(`input[name="${qn}"]:checked`)).map(el=>el.value);
+        answers[qn] = checked;
+        if (checked.length) answeredCount++;
+        qaPairs.push(`${i}. ${label}: ${checked.length ? checked.join(", ") : "(nenhuma opção marcada)"}`);
+
+      } else if (q.type === "input"){
+        const el  = document.getElementById(qn);
+        const val = (el?.value || "").trim();
+        answers[qn] = val;
+        if (val) answeredCount++;
+        qaPairs.push(`${i}. ${label}: ${val ? val.replace(/\s+/g," ").trim() : "(sem resposta)"}`);
+
+      } else {
+        qaPairs.push(`${i}. ${label}: (tipo não suportado)`);
+      }
     }
 
-    // Cálculo por dimensão
-    const scores = {};
-    let total = 0;
-    let index = 1;
-    Object.entries(DIMENSIONS).forEach(([dim, items]) => {
-      let dimSum = 0;
-      items.forEach(() => {
-        const v = answers[index];
-        if (v != null) dimSum += v;
-        index++;
+    // 🔴 AQUI ENTRA A TRAVA DE FORMULÁRIO INCOMPLETO
+    if (answeredCount < N) {
+      sending = false;
+      btn.disabled = false;
+      btn.textContent = originalText;
+
+      document.querySelectorAll(".q.missing").forEach(el => el.classList.remove("missing"));
+
+      let firstMissingEl = null;
+
+      QUESTIONS.forEach((q, idx) => {
+        const n  = idx + 1;
+        const qn = `q${String(n).padStart(2,"0")}`;
+        let empty = false;
+
+        if (typeof q === "string" || q.type === "input") {
+          const el = document.getElementById(qn);
+          empty = !el || !el.value.trim();
+          if (empty && !firstMissingEl && el) {
+            firstMissingEl = el.closest(".q") || el;
+          }
+        } else if (q.type === "radio" || q.type === "checkbox") {
+          const hasChecked = document.querySelectorAll(`input[name="${qn}"]:checked`).length > 0;
+          empty = !hasChecked;
+          if (empty && !firstMissingEl) {
+            const anyInput = document.querySelector(`input[name="${qn}"]`);
+            if (anyInput) {
+              firstMissingEl = anyInput.closest(".q") || anyInput;
+            }
+          }
+        }
+
+        if (empty) {
+          const labelEl = document.getElementById(`lbl${String(n).padStart(2,"0")}`);
+          const box = labelEl ? labelEl.closest(".q") : null;
+          if (box) box.classList.add("missing");
+        }
       });
-      scores[dim] = dimSum;
-      total += dimSum;
-    });
 
-    // Interpretação geral
-    let interpret = "";
-    if (total >= 100) interpret = "Perfil altamente criativo, com forte capacidade de gerar ideias originais e explorar diferentes abordagens para resolver problemas. Sugere grande potencial criativo em múltiplas áreas.";
-    else if (total >= 75) interpret = "Indica um bom nível de criatividade, com habilidades que se destacam em algumas dimensões específicas.";
-    else if (total >= 50) interpret = "Criatividade dentro do esperado para a faixa etária, com algumas áreas que podem se beneficiar de estímulo adicional.";
-    else interpret = "Sugere dificuldades em algumas áreas criativas. Recomendado um acompanhamento mais detalhado e atividades que estimulem a exploração de novas ideias e possibilidades.";
+      if (firstMissingEl) {
+        firstMissingEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
 
-    // Monta string das respostas
-    const questionsStr = allQuestions.map((txt, idx) => {
-      const ans = answers[idx + 1];
-      const label = OPTIONS.find(o => o.value == ans)?.label || "Sem resposta";
-      return `${idx + 1}. ${txt} => ${label}`;
-    }).join(" | ");
+      setBox(
+        "#msg",
+        `Você deixou ${N - answeredCount} questão(ões) sem responder. Complete todas antes de enviar.`,
+        "err"
+      );
+      return;
+    }
 
-    const durationSec = Math.round((Date.now() - startAt) / 1000);
+    // daqui pra baixo continua igual: anti-duplicidade, gravação, PATCH, etc.
+    const again = await sheetSearch(SHEETS.SCORES,{ cpf:CPF, code:CODE });
+    if (again && again.length){
+      setBox("#msg","Este formulário já foi enviado anteriormente. Voltando ao portal…","ok");
+      setTimeout(goPortalWithToken,1000);
+      return;
+    }
+
+    const categoria = qaPairs.join(" | ");
+    const durationSec = Math.round((Date.now()-startAt)/1000);
+
     const row = {
       result_id: `${patient.cpf}_${CODE}_${Date.now()}`,
       token: qs("token"),
       cpf: patient.cpf,
       code: CODE,
-      source: SOURCE,
+      source: "pais",
       submitted_at: new Date().toISOString(),
-      questions: questionsStr,
-      categoria: `Pontuações: ${Object.entries(scores).map(([k,v]) => `${k}: ${v}`).join(" | ")} | Total: ${total} | Interpretação: ${interpret}`,
-      metrics: JSON.stringify({ scores, total, answers, duration_sec: durationSec })
+      total: answeredCount,
+      categoria,
+      metrics: JSON.stringify({
+        questions: QUESTIONS,
+        answers,
+        answeredCount,
+        duration_sec: durationSec
+      })
     };
 
     await sheetCreate(SHEETS.SCORES, row);
@@ -439,17 +719,20 @@ $("#form").addEventListener("submit", async e => {
       [`${CODE}_FEITO`]: "sim",
       [`${CODE}_FEITO_AT`]: new Date().toISOString()
     });
-    localStorage.removeItem(AUTOSAVE_KEY);
-    setBox("#msg", "Formulário enviado com sucesso. Retornando ao portal…", "ok");
-    setTimeout(goPortalWithToken, 1500);
-  } catch (err) {
+
+    clearAutosave();
+    setBox("#msg","Anamnese enviada. Retornando ao portal…","ok");
+    setTimeout(goPortalWithToken, 1300);
+
+  } catch(err){
     console.error(err);
     setBox("#msg", err.message || "Falha ao enviar. Tente novamente.", "err");
-    sending = false;
-    btn.disabled = false;
-    btn.textContent = original;
+    sending=false; 
+    btn.disabled=false; 
+    btn.textContent=originalText;
   }
 });
+
 
 </script>
 </body>
